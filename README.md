@@ -30,6 +30,7 @@ Determine seismic force on equipment (Fp) per ASCE 7-16, then evaluate all overt
 - [Theoretical Background](#theoretical-background)
   * [Seismic Force (ASCE 7-16 Chapter 13)](#seismic-force--asce-7-16-chapter-13-)
   * [Anchor Group Geometric Properties](#anchor-group-geometric-properties)
+  * [Equipment Orientation](#equipment-orientation)
   * [Pivot Mode: Tension Demand](#pivot-mode--tension-demand)
   * [Stilt Mode: Tension Demand](#stilt-mode--tension-demand)
   * [Pivot Mode: Shear Demand](#pivot-mode--shear-demand)
@@ -399,7 +400,7 @@ A picture is worth a thousand words; a gif is worth ten thousand. Here's a compa
 
 
 
-### Seismic Force (ASCE 7-16 Chapter 13)
+### Load Combination and Seismic Force (ASCE 7-16 Chapter 13)
 
 13.3.1.1 - the component seismic design force can be calculated as
 
@@ -420,18 +421,83 @@ where:
 * $z$ is the height in elevation of component's point of attachment
 * $h$ is the height of the building
 
-The z/h ratio converts PGA to PFA and is 1.0 at ground and 3.0 at the roof.
+The z/h ratio essentially converts PGA to PFA and is 1.0 at ground and 3.0 at the roof. $F_p$ force shall be applied at component's center of gravity. Component parameters ($a_p, R_p, \Omega_p$) can be found in ASCE 7-16
 
-The $F_p$ force is applied at component's center of gravity and shall be applied independently in at least two orthogonal horizontal directions
-
-Component parameters ($a_p, R_p, \Omega_p$) can be found in ASCE 7-16
 * Mechanical and electrical: Table 13.6-1
 * Architectural: Table 13.5-1
+
+Depending on the load combination type ("ASD" or "LRFD"), the following adjustments are made to the seismic force and equipment weight.
+
+* For LRFD:
+  * $(0.9 - 0.2 S_{ds}) \times W_p$
+  * $1.0F_p$
+* For ASD:
+  * $(0.6 - (0.7)(0.2)S_{ds}) \times W_p$
+  * $0.7F_p$
+
+For analyses requiring overstrength such as equipment anchorage into concrete, replace $F_p$ with $E_{mh}$ where:
+
+$$ E_{mh} = \Omega_p \times F_p $$
 
 
 
 ### Anchor Group Geometric Properties
 
+Let $(x_i, y_i)$ be the anchor coordinates. For an anchor group:
+
+The center of gravity (or center of resistance) is:
+
+$$\bar{x} = \frac{x_i}{\sum x_i}$$
+
+$$\bar{y} = \frac{y_i}{\sum y_i}$$
+
+The moment of inertia about x and y axis is:
+
+$$I_x = \sum (y_i - \bar{y})^2$$
+
+$$I_y = \sum (x_i - \bar{x})^2$$
+
+The polar moment of inertia is:
+
+$$I_z = I_x + I_y$$
+
+The product moment of inertia (which is zero at principal axis) is:
+
+$$I_xy = \sum (x_i - \bar{x})(y_i - \bar{y})$$
+
+From the above parameters, we can use the Mohr's circle equations for moment of inertia to get max/min moment of inertia and the associated rotation to principal axes:
+
+$$I_{max} = \frac{I_x + I_y}{2} + \sqrt{ (\frac{I_x - I_y}{2})^2 + (I__{xy})^2 }$$
+
+$$I_{min} = \frac{I_x + I_y}{2} - \sqrt{ (\frac{I_x - I_y}{2})^2 + (I__{xy})^2 }$$
+
+$$\theta = \arctan{\left( \frac{I_{xy}}{(I_x - I_y)/2} \right ) } / 2$$
+
+### Equipment Orientation
+
+All anchors and footprints have a specific x,y coordinates (e.g. anchor.x, anchor.y). Rotating the equipment is simply a matter of applying a rotational transformation matrix.
+
+let the original coordinate be as a position vector:
+
+$$\bar{r}=\{x,y\}$$
+
+The new coordinate after rotation is:
+
+$$\bar{r'}=\{x',y'\}$$
+
+The relationship between the two is:
+
+$$\bar{r'}=[T] \bar{r}$$
+
+Where the transformation matrix is defined as:
+
+$$
+[T] = 
+\begin{bmatrix}
+cos(\theta) & -sin(\theta)\\
+sin(\theta) & cos(\theta)
+\end{bmatrix}\\
+$$
 
 
 ### Pivot Mode: Tension Demand
