@@ -6,14 +6,36 @@
   <br>
 </h1>
 <p align="center">
-Determine anchor tension and shear envelope curve for all overturning orientations.
+Determine seismic force on equipment (Fp) per ASCE 7-16, then evaluate all overturning orientations for most critical anchor tension and shear demand.
 </p>
+
+
 
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif2" style="width: 100%;" />
 </div>
 
+
+- [Introduction](#introduction)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Step 1: Initialize equipment object](#step-1--initialize-equipment-object)
+  * [Step 2: Define equipment footprint](#step-2--define-equipment-footprint)
+  * [Step 3: Add anchors](#step-3--add-anchors)
+  * [Step 4: Solve](#step-4--solve)
+  * [Step 5: Visualize](#step-5--visualize)
+  * [Step 6: Export results to CSV](#step-6--export-results-to-csv)
+- [Theoretical Background](#theoretical-background)
+  * [Seismic Force (ASCE 7-16 Chapter 13)](#seismic-force--asce-7-16-chapter-13-)
+  * [Anchor Group Geometric Properties](#anchor-group-geometric-properties)
+  * [Pivot Mode: Tension Demand](#pivot-mode--tension-demand)
+  * [Stilt Mode: Tension Demand](#stilt-mode--tension-demand)
+  * [Pivot Mode: Shear Demand](#pivot-mode--shear-demand)
+  * [Stilt Mode Shear Demand](#stilt-mode-shear-demand)
+- [Notes and Assumptions](#notes-and-assumptions)
+- [License](#license)
 
 
 
@@ -43,11 +65,11 @@ The impetus for this package came from a lengthy technical discussion at work. I
 	- With EZAnchor, this barrier is essentially removed and you can evaluate all possible overturning orientations, for anchor group of arbitrary complexity, and get results in seconds. This was extremely time-consuming if not impossible to do by hand or spreadsheet.
 * Is it appropriate to use the classical mechanics equation even when an equipment is bearing on the floor?
 	- No, those equations are only valid if equipment is standing on feet because anchor is assumed to take compression (see the free-body diagrams above). If blindly applied, the results tend to be extremely conservative, not to mention erroneous from the outset. 
-	- Furthermore, even when they are appropriate, they are often incorrectly applied (when anchor group is not a rectangle) because linear combination of moments in two orthogonal directions MUST be about the anchor group's principal axes of inertia. Meaning you'd first have to 1.) find anchor group centroid and moment of inertias, 2.) use those Mohr's circle equations, 3.) rotate all coordinates to the principal axes, 4.) find new centroid and moment of inertia and do all calculation at this rotated geometry.
+	- Furthermore, even when they are appropriate, they are often incorrectly applied (when anchor group is not rectangular). Linear combination of moments in two orthogonal directions MUST be about the anchor group's principal axes of inertia. Meaning you'd first have to 1.) find anchor group centroid and moment of inertias, 2.) use those Mohr's circle equations, 3.) rotate all coordinates to the principal axes, 4.) find new centroid and moment of inertia and do all calculation at this rotated geometry.
 
 The current standard of practice is to perform equipment anchorage calculations in the two most obvious orthogonal directions. However, ASCE 7-16 13.3.1.1 states that for "vertically cantilevered systems", Fp shall be assumed to act in **any** horizontal direction. Since all floor-mounted equipment can be considered "vertically cantilevered", many engineers and authority-having jurisdictions are pushing for finding the "critical angle" of overturning. I don't think this is trivial.
 
-In "Pivot Mode" where point of overturning is about the edge of an equipment, the tension demand at a particular anchor is NOT the linear combination of results from two arbitrarily selected basis (that can be conveniently added together). In "Stilt Mode", we must be cognizant of the fact that critical overturning orientation (where max tension occurs) usually does not align with the minimum principal axis of inertia (it's usually 10 to 45 degrees shifted from it).
+In "Pivot Mode" where point of overturning is about the edge of an equipment, the tension demand at a particular anchor is NOT the linear combination of results from two arbitrarily selected basis (that can be conveniently added together). In "Stilt Mode", we must be cognizant of the fact that critical overturning orientation (where max tension occurs) usually does not align with the minimum principal axis of inertia (it's usually 10 to 45 degrees offset from it).
 
 **Disclaimer:** this package is meant for <u>personal or educational purpose only</u>. The results have NOT been thoroughly validated and the tool is not as robust as it could be; therefore, EZAnchor is NOT for commercial use of any kind!
 
@@ -359,17 +381,67 @@ Note that if {Equipment.name}_run_results folder already exists, EZAnchor will c
 
 ## Theoretical Background
 
-[TO DO]
+A picture is worth a thousand words; a gif is worth ten thousand. Here's a comparison between "Stilt Mode" and "Pivot Mode". 
 
+* In pivot mode, we are rotating the entire equipment. Seismic force (Fp) is always applied upward
+* In stilt mode, we are rotating the force vector
+
+**Pivot Mode:**
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif2" style="width: 80%;" />
+</div>
+**Stilt Mode:**
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/stilt.gif" alt="demogif2" style="width: 80%;" />
+</div>
 ### Seismic Force (ASCE 7-16 Chapter 13)
+
+13.3.1.1 - the component seismic design force can be calculated as
+
+$$F_p = 0.4 (\frac{a_p}{R_p / I_p}) (1 + \frac{2z}{h}) S_{DS} W_p$$
+
+subject to the following maximum and minimum values
+
+$$F_{pmax} = 1.6 S_{DS} I_p W_p$$
+
+$$F_{pmin} = 0.3 S_{DS} I_p W_p$$
+
+where:
+
+* $a_p$ is the component amplification factor (which accounts for flexibility of equipment and resulting dynamic amplification. 1.0 for rigid, 2.5 for highly flexible)
+* $$R_p$$ is the component response modification factor (which accounts for equipment's inherent ductility)
+* $$W_p$$ is the component weight
+* $$I_p$$ is the component importance factor
+* $$z$$ is the height in elevation of component's point of attachment
+* $$h$$ is the height of the building (not including any parapet!)
+
+The z/h ratio essentially dictate an amplification of 1.0 at ground, and 3.0 at the roof.
+
+The $$F_p$$ force is applied at component's center of gravity and shall be applied independently in at least two orthogonal horizontal directions
+
+The component parameters ($$a_p, R_p, \Omega_p$$) for an exhaustive list of components can be found in ASCE 7-16
+* Mechanical and electrical: Table 13.6-1
+* Architectural: Table 13.5-1
+
+
 
 ### Anchor Group Geometric Properties
 
+
+
 ### Pivot Mode: Tension Demand
+
+
 
 ### Stilt Mode: Tension Demand
 
+
+
 ### Pivot Mode: Shear Demand
+
+
 
 ### Stilt Mode Shear Demand
 
