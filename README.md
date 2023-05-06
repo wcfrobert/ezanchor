@@ -396,13 +396,16 @@ A picture is worth a thousand words; a gif is worth ten thousand. Here's a compa
 <div align="center">
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/stilt.gif" alt="demogif2" style="width: 80%;" />
 </div>
+
+
+
 ### Seismic Force (ASCE 7-16 Chapter 13)
 
 13.3.1.1 - the component seismic design force can be calculated as
 
 $$F_p = 0.4 (\frac{a_p}{R_p / I_p}) (1 + \frac{2z}{h}) S_{DS} W_p$$
 
-subject to the following maximum and minimum values
+subject to the following floor and ceiling values.
 
 $$F_{pmax} = 1.6 S_{DS} I_p W_p$$
 
@@ -411,17 +414,17 @@ $$F_{pmin} = 0.3 S_{DS} I_p W_p$$
 where:
 
 * $a_p$ is the component amplification factor (which accounts for flexibility of equipment and resulting dynamic amplification. 1.0 for rigid, 2.5 for highly flexible)
-* $$R_p$$ is the component response modification factor (which accounts for equipment's inherent ductility)
-* $$W_p$$ is the component weight
-* $$I_p$$ is the component importance factor
-* $$z$$ is the height in elevation of component's point of attachment
-* $$h$$ is the height of the building (not including any parapet!)
+* $R_p$ is the component response modification factor (which accounts for equipment's inherent ductility)
+* $W_p$ is the component weight
+* $I_p$ is the component importance factor
+* $z$ is the height in elevation of component's point of attachment
+* $h$ is the height of the building
 
-The z/h ratio essentially dictate an amplification of 1.0 at ground, and 3.0 at the roof.
+The z/h ratio converts PGA to PFA and is 1.0 at ground and 3.0 at the roof.
 
-The $$F_p$$ force is applied at component's center of gravity and shall be applied independently in at least two orthogonal horizontal directions
+The $F_p$ force is applied at component's center of gravity and shall be applied independently in at least two orthogonal horizontal directions
 
-The component parameters ($$a_p, R_p, \Omega_p$$) for an exhaustive list of components can be found in ASCE 7-16
+Component parameters ($a_p, R_p, \Omega_p$) can be found in ASCE 7-16
 * Mechanical and electrical: Table 13.6-1
 * Architectural: Table 13.5-1
 
