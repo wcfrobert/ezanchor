@@ -378,6 +378,10 @@ EZAnchor will create a folder called {Equipment.name}_run_results. Within the fo
 
 Note that if {Equipment.name}_run_results folder already exists, EZAnchor will create another folder by appending an integer to the end of the folder name.
 
+```python
+AHU4.export_data()
+```
+
 
 
 ## Theoretical Background
@@ -392,6 +396,8 @@ A picture is worth a thousand words; a gif is worth ten thousand. Here's a compa
 <div align="center">
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif2" style="width: 80%;" />
 </div>
+
+
 **Stilt Mode:**
 
 <div align="center">
@@ -467,11 +473,13 @@ $$I_xy = \sum (x_i - \bar{x})(y_i - \bar{y})$$
 
 From the above parameters, we can use the Mohr's circle equations for moment of inertia to get max/min moment of inertia and the associated rotation to principal axes:
 
-$$I_{max} = \frac{I_x + I_y}{2} + \sqrt{ (\frac{I_x - I_y}{2})^2 + (I__{xy})^2 }$$
+$$I_{max} = \frac{I_x + I_y}{2} + \sqrt{ ((I_x - I_y) / 2)^2 + (I__{xy})^2 }$$
 
 $$I_{min} = \frac{I_x + I_y}{2} - \sqrt{ (\frac{I_x - I_y}{2})^2 + (I__{xy})^2 }$$
 
 $$\theta = \arctan{\left( \frac{I_{xy}}{(I_x - I_y)/2} \right ) } / 2$$
+
+
 
 ### Equipment Orientation
 
@@ -479,11 +487,11 @@ All anchors and footprints have a specific x,y coordinates (e.g. anchor.x, ancho
 
 let the original coordinate be as a position vector:
 
-$$\bar{r}=\{x,y\}$$
+$$\bar{r}=\\{x,y\\}$$
 
 The new coordinate after rotation is:
 
-$$\bar{r'}=\{x',y'\}$$
+$$\bar{r'}=\\{x',y'\\}$$
 
 The relationship between the two is:
 
