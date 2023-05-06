@@ -16,6 +16,7 @@ fig = eza.plotter.preview(AHU4)
 # solve
 AHU4.solve(on_stilt=True)
 fig3 = eza.plotter.plot_equipment(AHU4)
+fig3.savefig("simple.png")
 
 # export data
 # AHU4.export_data()

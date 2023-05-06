@@ -2,17 +2,13 @@
   <br>
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/logo.png" alt="logo" style="zoom:80%;" />
   <br>
-  EZAnchor - Nonstructural Component Anchorage
+  Nonstructural Component Anchorage Calculation
   <br>
 </h1>
-
 <p align="center">
-Determine maximum anchor tension and shear demand for all possible equipment overturning orientations.
+Determine anchor tension and shear envelope curve for all overturning orientations.
 </p>
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/stilt.gif" alt="demogif1" style="width: 100%;" />
-</div>
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif2" style="width: 100%;" />
@@ -21,18 +17,14 @@ Determine maximum anchor tension and shear demand for all possible equipment ove
 
 
 
-
 ## Introduction
 
-EZAnchor is a Python applet that performs nonstructural components seismic force (Fp) calculations per ASCE 7-16 Chapter 13, it then applies Fp in all possible directions (all 360 degrees) to determine the maximum shear and tension demand in the anchor group holding the equipment in place.
+EZAnchor is a Python applet that performs nonstructural components seismic force (Fp) calculations per ASCE 7-16 Chapter 13, it then applies Fp in all possible directions (all 360 degrees) to determine the maximum shear and tension in the anchors holding the equipment in place.
 
-<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD1.png" alt="FBD1" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD_COMBINED.png" alt="FBD" style="width:90%;" /> 
 
 
-
-<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD2.png" alt="FBD2" style="zoom:50%;" />
-
-The technical background for equipment overturning calculation is quite simple. If you make some simplifying assumptions, you just need some statics and free-body diagrams. What makes EZAnchor special is that it doesn't make many simplifications. See "Theoretical Background" section for more info.
+The technical background for equipment overturning calculation is quite simple. In most cases, some basic statics and free-body diagrams will get you an answer that is good enough. What makes EZAnchor special is that it doesn't make many simplifying assumptions. See "Theoretical Background" section for more info.
 
 * Can evaluate equipment with arbitrary number and arrangement of anchors
 * Can evaluate equipment overturning in all possible orientations
@@ -41,18 +33,23 @@ The technical background for equipment overturning calculation is quite simple. 
 * Can quickly switch between "Pivot Mode" or "Stilt Mode"
 * Quick and easy-to-use
 
-The impetus for this package came from a lengthy technical discussion at work. I wanted to resolve two questions that's been stuck in my mind for the past few months:
+The impetus for this package came from a lengthy technical discussion at work. I wanted to resolve two questions that's been gnawing at me for months:
 
-* Should overturning be evaluated in all possible orientations? Is it even worth the effort?
-	- I don't think so, at least for most practical cases. Nevertheless, you can if you wish with EZAnchor. For simple cases, you really don't gain much insight with all that extra effort. However, there are cases where I think the additional rigor could be justified. For instance if: a.) equipment is on feet or b.) irregular equipment shape (like a L or T).
+* Should overturning be evaluated in all possible orientations? Is it worth the effort?
+	- I don't think so, at least for most practical cases. For simple cases, you really don't gain all that much insight with the additional effort. Plus It's difficult to conceptualize how a rectangular equipment can overturn about a corner (say at 26 degrees...). However, there are cases where I think the additional rigor can be justified. For instance if
+	  - equipment is on feet
+	  - irregular equipment shape (like a L or T)
+	  - large plan eccentricity between center of mass (of equipment), and center of resisitance (of anchors) which could result in large torsion and shear amplification
+	- With EZAnchor, this barrier is essentially removed and you can evaluate all possible overturning orientations, for anchor group of arbitrary complexity, and get results in seconds. This was extremely time-consuming if not impossible to do by hand or spreadsheet.
 * Is it appropriate to use the classical mechanics equation even when an equipment is bearing on the floor?
-	- No, those equations are only valid if equipment is standing on feet. The results tend to be overly conservative. Furthermore, they should only be applied about the anchor group's principal axes of inertia. Meaning you'd have to use those Mohr's circle equations first.
+	- No, those equations are only valid if equipment is standing on feet because anchor is assumed to take compression (see the free-body diagrams above). If blindly applied, the results tend to be extremely conservative, not to mention erroneous from the outset. 
+	- Furthermore, even when they are appropriate, they are often incorrectly applied (when anchor group is not a rectangle) because linear combination of moments in two orthogonal directions MUST be about the anchor group's principal axes of inertia. Meaning you'd first have to 1.) find anchor group centroid and moment of inertias, 2.) use those Mohr's circle equations, 3.) rotate all coordinates to the principal axes, 4.) find new centroid and moment of inertia and do all calculation at this rotated geometry.
 
 The current standard of practice is to perform equipment anchorage calculations in the two most obvious orthogonal directions. However, ASCE 7-16 13.3.1.1 states that for "vertically cantilevered systems", Fp shall be assumed to act in **any** horizontal direction. Since all floor-mounted equipment can be considered "vertically cantilevered", many engineers and authority-having jurisdictions are pushing for finding the "critical angle" of overturning. I don't think this is trivial.
 
-In "Pivot Mode" where point of overturning is about the edge of an equipment, the tension demand at a particular anchor is NOT the linear combination of results from two arbitrarily selected basis (that can be conveniently added together). In "Stilt Mode", we must be cognizant of the fact that critical overturning orientation (where max tension occurs) usually does not align with the minimum principal axis of inertia (it's usually 20 to 45 degrees shifted from it).
+In "Pivot Mode" where point of overturning is about the edge of an equipment, the tension demand at a particular anchor is NOT the linear combination of results from two arbitrarily selected basis (that can be conveniently added together). In "Stilt Mode", we must be cognizant of the fact that critical overturning orientation (where max tension occurs) usually does not align with the minimum principal axis of inertia (it's usually 10 to 45 degrees shifted from it).
 
-**Disclaimer:** this package is meant for <u>personal or educational use only</u>. The results have NOT been thoroughly validated and the tool is not as robust as it could be; therefore, EZAnchor is NOT for commercial use of any kind!
+**Disclaimer:** this package is meant for <u>personal or educational purpose only</u>. The results have NOT been thoroughly validated and the tool is not as robust as it could be; therefore, EZAnchor is NOT for commercial use of any kind!
 
 
 
@@ -366,6 +363,8 @@ Note that if {Equipment.name}_run_results folder already exists, EZAnchor will c
 
 ### Seismic Force (ASCE 7-16 Chapter 13)
 
+### Anchor Group Geometric Properties
+
 ### Pivot Mode: Tension Demand
 
 ### Stilt Mode: Tension Demand
@@ -390,8 +389,6 @@ Note that if {Equipment.name}_run_results folder already exists, EZAnchor will c
   * Sign of moment follows the right-hand rule. Mz is positive counter-clockwise
   * Compression is negative (-), tension is positive (+)
 * EZAnchor is agnostic when it comes to unit. Please ensure your input is consistent. I prefer to use lbs and inches
-
-
 
 
 
