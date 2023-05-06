@@ -473,9 +473,9 @@ $$I_xy = \sum (x_i - \bar{x})(y_i - \bar{y})$$
 
 From the above parameters, we can use the Mohr's circle equations for moment of inertia to get max/min moment of inertia and the associated rotation to principal axes:
 
-$$I_{max} = \frac{I_x + I_y}{2} + \sqrt{ ((I_x - I_y) / 2)^2 + (I__{xy})^2 }$$
+$$I_{max} = \frac{I_x + I_y}{2} + \sqrt{((I_x - I_y)/2)^2 + (I_{xy})^2}$$
 
-$$I_{min} = \frac{I_x + I_y}{2} - \sqrt{ (\frac{I_x - I_y}{2})^2 + (I__{xy})^2 }$$
+$$I_{max} = \frac{I_x + I_y}{2} - \sqrt{((I_x - I_y)/2)^2 + (I_{xy})^2}$$
 
 $$\theta = \arctan{\left( \frac{I_{xy}}{(I_x - I_y)/2} \right ) } / 2$$
 
