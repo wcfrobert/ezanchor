@@ -2,12 +2,14 @@
   <br>
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/logo.png" alt="logo" style="zoom:80%;" />
   <br>
-  Nonstructural Component Anchorage Calculation
+  Nonstructural Component Anchorage Calculator
   <br>
 </h1>
 <p align="center">
-Determine seismic force on equipment (Fp) per ASCE 7-16, then evaluate all overturning orientations for most critical anchor tension and shear demand.
+EZAnchor evaluates overturning of nonstructural components due to seismic excitation in all possible orientations to determine critical anchor shear/tension demands.
 </p>
+
+
 
 
 
@@ -28,13 +30,11 @@ Determine seismic force on equipment (Fp) per ASCE 7-16, then evaluate all overt
   * [Step 5: Visualize](#step-5--visualize)
   * [Step 6: Export results to CSV](#step-6--export-results-to-csv)
 - [Theoretical Background](#theoretical-background)
-  * [Seismic Force (ASCE 7-16 Chapter 13)](#seismic-force--asce-7-16-chapter-13-)
+  * [Load Combination and Seismic Force (ASCE 7-16 Chapter 13)](#load-combination-and-seismic-force--asce-7-16-chapter-13-)
   * [Anchor Group Geometric Properties](#anchor-group-geometric-properties)
   * [Equipment Orientation](#equipment-orientation)
-  * [Pivot Mode: Tension Demand](#pivot-mode--tension-demand)
-  * [Stilt Mode: Tension Demand](#stilt-mode--tension-demand)
-  * [Pivot Mode: Shear Demand](#pivot-mode--shear-demand)
-  * [Stilt Mode Shear Demand](#stilt-mode-shear-demand)
+  * [Pivot Mode](#pivot-mode)
+  * [Stilt Mode](#stilt-mode)
 - [Notes and Assumptions](#notes-and-assumptions)
 - [License](#license)
 
@@ -47,7 +47,7 @@ EZAnchor is a Python applet that performs nonstructural components seismic force
 <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD_COMBINED.png" alt="FBD" style="width:90%;" /> 
 
 
-The technical background for equipment overturning calculation is quite simple. In most cases, some basic statics and free-body diagrams will get you an answer that is good enough. What makes EZAnchor special is that it doesn't make many simplifying assumptions. See "Theoretical Background" section for more info.
+The technical background for equipment overturning calculation is quite simple. In most cases, some basic statics and free-body diagrams will get you close enough to a reasonable answer. What makes EZAnchor special are the following features.
 
 * Can evaluate equipment with arbitrary number and arrangement of anchors
 * Can evaluate equipment overturning in all possible orientations
@@ -58,21 +58,21 @@ The technical background for equipment overturning calculation is quite simple. 
 
 The impetus for this package came from a lengthy technical discussion at work. I wanted to resolve two questions that's been gnawing at me for months:
 
-* Should overturning be evaluated in all possible orientations? Is it worth the effort?
-	- I don't think so, at least for most practical cases. For simple cases, you really don't gain all that much insight with the additional effort. Plus It's difficult to conceptualize how a rectangular equipment can overturn about a corner (say at 26 degrees...). However, there are cases where I think the additional rigor can be justified. For instance if
+1. Should overturning be evaluated in all possible orientations? Is it worth the effort?
+	- I don't think so, at least for most practical cases. For simple cases, you really don't gain all that much insight with the additional effort; however, there are cases where I think the additional rigor can be justified. For instance if
 	  - equipment is on feet
 	  - irregular equipment shape (like a L or T)
-	  - large plan eccentricity between center of mass (of equipment), and center of resisitance (of anchors) which could result in large torsion and shear amplification
-	- With EZAnchor, this barrier is essentially removed and you can evaluate all possible overturning orientations, for anchor group of arbitrary complexity, and get results in seconds. This was extremely time-consuming if not impossible to do by hand or spreadsheet.
-* Is it appropriate to use the classical mechanics equation even when an equipment is bearing on the floor?
-	- No, those equations are only valid if equipment is standing on feet because anchor is assumed to take compression (see the free-body diagrams above). If blindly applied, the results tend to be extremely conservative, not to mention erroneous from the outset. 
-	- Furthermore, even when they are appropriate, they are often incorrectly applied (when anchor group is not rectangular). Linear combination of moments in two orthogonal directions MUST be about the anchor group's principal axes of inertia. Meaning you'd first have to 1.) find anchor group centroid and moment of inertias, 2.) use those Mohr's circle equations, 3.) rotate all coordinates to the principal axes, 4.) find new centroid and moment of inertia and do all calculation at this rotated geometry.
+	  - large eccentricity between center of mass (of equipment), and center of resistance (of anchors) which creates torsion and amplifies anchor shear demand
+	- With EZAnchor, this barrier is essentially removed and you can evaluate all possible overturning orientations, for anchor group of arbitrary complexity, and get results in seconds. This was extremely time-consuming, if not impossible, to do by hand or spreadsheet.
+2. Is it appropriate to use the classical mechanics equation even when an equipment is bearing on the floor?
+	- No, those equations are only valid if equipment is standing on feet because anchor is assumed to take compression (see the free-body diagrams above). If blindly applied, the results tend to be overly conservative, not to mention erroneous from the outset. 
+	- Furthermore, even when they are appropriate, they are often incorrectly applied when anchor is more complicated (not rectangular). Linear combination of moments in two orthogonal directions MUST be about the anchor group's principal axes of inertia. Meaning you'd first have to 1.) find anchor group centroid and moment of inertias, 2.) use those Mohr's circle equations, 3.) rotate all coordinates to the principal axes, 4.) find new centroid and moment of inertia and do all calculation at this rotated geometry.
 
 The current standard of practice is to perform equipment anchorage calculations in the two most obvious orthogonal directions. However, ASCE 7-16 13.3.1.1 states that for "vertically cantilevered systems", Fp shall be assumed to act in **any** horizontal direction. Since all floor-mounted equipment can be considered "vertically cantilevered", many engineers and authority-having jurisdictions are pushing for finding the "critical angle" of overturning. I don't think this is trivial.
 
 In "Pivot Mode" where point of overturning is about the edge of an equipment, the tension demand at a particular anchor is NOT the linear combination of results from two arbitrarily selected basis (that can be conveniently added together). In "Stilt Mode", we must be cognizant of the fact that critical overturning orientation (where max tension occurs) usually does not align with the minimum principal axis of inertia (it's usually 10 to 45 degrees offset from it).
 
-**Disclaimer:** this package is meant for <u>personal or educational purpose only</u>. The results have NOT been thoroughly validated and the tool is not as robust as it could be; therefore, EZAnchor is NOT for commercial use of any kind!
+**Disclaimer:** this package is meant for <u>personal or educational purpose only</u>. I did not spent much time debugging and validating all possible edge cases. EZAnchor should not be used for commercial purpose of any kind!
 
 
 
@@ -369,14 +369,14 @@ fig3 = eza.plotter.plot_equipment(AHU4)
 
 ### Step 6: Export results to CSV
 
-`Equipment.export_data()` export all analysis results to csv file to the current working directory.
+`Equipment.export_data()` export results to csv file in the current working directory.
 
-EZAnchor will create a folder called {Equipment.name}_run_results. Within the folder you will see csv files.
+EZAnchor will create a folder called {Equipment.name}_run_results. Within the folder you will see two csv files.
 
-* AHU4_anchors - results for individual anchors
-* AHU4_equipment - results for equipment
+* AHU4_anchors.csv - results for individual anchors
+* AHU4_equipment.csv - results for equipment
 
-Note that if {Equipment.name}_run_results folder already exists, EZAnchor will create another folder by appending an integer to the end of the folder name.
+Note that if {Equipment.name}_run_results folder already exists, EZAnchor will create another folder by appending an integer to the end of the folder name (e.g. AHU4_run_results1).
 
 ```python
 AHU4.export_data()
@@ -386,29 +386,10 @@ AHU4.export_data()
 
 ## Theoretical Background
 
-A picture is worth a thousand words; a gif is worth ten thousand. Here's a comparison between "Stilt Mode" and "Pivot Mode". 
-
-* In pivot mode, we are rotating the entire equipment. Seismic force (Fp) is always applied upward
-* In stilt mode, we are rotating the force vector
-
-**Pivot Mode:**
-
-<div align="center">
-  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif2" style="width: 80%;" />
-</div>
-
-
-**Stilt Mode:**
-
-<div align="center">
-  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/stilt.gif" alt="demogif2" style="width: 80%;" />
-</div>
-
-
 
 ### Load Combination and Seismic Force (ASCE 7-16 Chapter 13)
 
-13.3.1.1 - the component seismic design force can be calculated as
+The component seismic design force can be calculated as
 
 $$F_p = 0.4 (\frac{a_p}{R_p / I_p}) (1 + \frac{2z}{h}) S_{DS} W_p$$
 
@@ -427,7 +408,7 @@ where:
 * $z$ is the height in elevation of component's point of attachment
 * $h$ is the height of the building
 
-The z/h ratio essentially converts PGA to PFA and is 1.0 at ground and 3.0 at the roof. $F_p$ force shall be applied at component's center of gravity. Component parameters ($a_p, R_p, \Omega_p$) can be found in ASCE 7-16
+The z/h ratio essentially converts PGA to PFA and is 1.0 at ground and 3.0 at the roof. $F_p$ force shall be applied at component's center of gravity. Component parameters ($a_p, R_p, \Omega_p$) can be found in ASCE 7-16.
 
 * Mechanical and electrical: Table 13.6-1
 * Architectural: Table 13.5-1
@@ -487,11 +468,11 @@ All anchors and footprints have a specific x,y coordinates (e.g. anchor.x, ancho
 
 let the original coordinate be as a position vector:
 
-$$\bar{r}=\\{x,y\\}$$
+$$\bar{r}=\{x,y\}$$
 
 The new coordinate after rotation is:
 
-$$\bar{r'}=\\{x',y'\\}$$
+$$\bar{r'}=\{x',y'\}$$
 
 The relationship between the two is:
 
@@ -508,19 +489,141 @@ sin(\theta) & cos(\theta)
 $$
 
 
-### Pivot Mode: Tension Demand
+### Pivot Mode
+
+In pivot mode, the seismic force (Fp) is always applied in the +Y direction. It's the equipment geometry that is being rotated.
+
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif1" style="width: 80%;" />
+</div>
+
+
+<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD1.png" alt="coordinate" style="zoom:80%;" />
+
+**Tension Demand**
+
+0.) This methodology involves finding a point of pivot at the edge of the equipment footprint, then calculating anchor tension using the rigid base assumption (similar triangles). EZAnchor determines the point of pivot as the topmost bounding box point.
+
+$$y_{pivot} = max(y)$$
+
+1.) Find the depth from pivot point for all anchors:
+
+$$d_i = y_{pivot} - y_i$$
+
+2.) Overturning moment due to seismic force (see section above for required load combination factors). ($CG_z$ is equipment center of mass above ground).
+
+$$M_{ot} = F_p \times CG_z$$
+
+3.) Resisting moment from equipment self weight (see section above for required load combination factors): ($y_{cog}$ is y-coordinate of equipment center of mass).
+
+$$M_r = W_p \times (y_{pivot} - y_{cog}) $$
+
+4.) The net moment creating tension is equal to the following. If negative, seismic force is small enough for the equipment to remain stable without any anchorage.
+
+$$M_{net} = M_{ot} - M_r$$
+
+5.) Note anchor is index i, i+1, ... N-1, N. Where i is the anchor closest to pivot, and N is anchor furthest from pivot. The tension demand in the anchor furthest from pivot is equal to the following. 
+
+$$T_{max} = T_{N} = \frac{M_{net}}{\sum d_i^2 /d_N}$$
+
+6.) For the other anchors:
+
+$$T_i = \frac{d_i}{d_N} \times T_{max}$$
+
+Note that in-plane torsion due to COG and COR offset does not affect tension demand in pivot mode.
+
+IMPORTANT ASSUMPTION: Please note that an important simplification is made here which is very typical for equpment anchorage calculations. Refering to the free-body diagram above, notice how the concrete bearing reaction (C) is represented as a concentrated point load, rather than a distributed stress profile (e.g. rectangular stress block). In essence, rather than meshing with concrete fibers and finding the exact neutral axis depth for every orientation (which takes significantly more memory and compute), we recognize that the depth of concrete stress block is always small relative to the equipment footprint, and that the phenomenon of <u>overturning</u> involves the edge of the equipment. In other words, although it is more exact to mesh and find the exact depth of neutral axis, the change to the final answer is insignificant. That being said, the user should ensure that the footprint of the equipment is large enough relative to neutral axis depth.
 
 
 
-### Stilt Mode: Tension Demand
+**Shear Demand**
+
+1.) Direct shear demand is easy to determine
+
+$$v_{dx} = 0$$
+
+$$v_{dy}=-\frac{F_p}{N_{anchor}}$$
+
+2.) In pivot mode, eccentricity is always in the x-direction because seismic force (Fp) is always applied in the +Y direction.
+
+$$ecc_x = x_{cog} - x_{cor}$$
+
+$$ecc_y = 0$$
+
+3.) Torsion caused by this offset is equal to:
+
+$$torsion = F_p \times ecc_x$$
+
+4.) Torsional shear is calculated as follows for anchor i:
+
+$$v_{tx} = \frac{torsion \times (y_i - y_{cor})}{I_z}$$
+
+$$v_{ty} = 0$$
+
+5.) Total shear is equal to:
+
+$$V_{total} = \sqrt{(v_{dx} +v_{tx})^2 + (v_{dy} + v_{ty})^2}$$
 
 
 
-### Pivot Mode: Shear Demand
+
+
+### Stilt Mode
+
+In stilt mode, the equipment geometry does not change, instead we are rotating the force/moment vector. 
+
+Very Important to note that 0th degree is actually +Y and degree is measured from vertical axis.
 
 
 
-### Stilt Mode Shear Demand
+<div align="center">
+  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/stilt.gif" alt="demogif2" style="width: 80%;" />
+</div>
+
+
+<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD2.png" alt="FBD2" style="zoom:80%;" />
+
+
+
+**Tension Demand**
+
+TO DO
+
+**Shear Demand**
+
+0.) Unlike pivot mode, we first need to determine the component of seismic force vectors:
+
+$$F_{px} = - F_p \times sin(\theta)$$
+
+$$F_{py} = F_p \times cos(\theta)$$
+
+1.) Direct shear demand is easy to determine
+
+$$v_{dx} =-\frac{F_{px}}{N_{anchor}}$$
+
+$$v_{dy} =-\frac{F_{py}}{N_{anchor}}$$
+
+2.) Eccentricity is calculated as shown:
+
+$$ecc_x = x_{cog} - x_{cor}$$
+
+$$ecc_y = -(y_{cog} - y_{cor})$$
+
+3.) Torsion caused by this offset is equal to:
+
+$$torsion = F_{py} \times ecc_x + F_{px} \times ecc_y$$
+
+4.) Torsional shear is calculated as follows for anchor i:
+
+$$v_{tx} = \frac{torsion \times (y_i - y_{cor})}{I_z}$$
+
+$$v_{ty} = torsion \times (x_i - x_{cor})$$
+
+5.) Total shear is equal to:
+
+$$V_{total} = \sqrt{(v_{dx} +v_{tx})^2 + (v_{dy} + v_{ty})^2}$$
+
 
 
 
