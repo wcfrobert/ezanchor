@@ -500,9 +500,9 @@ In pivot mode, the seismic force (Fp) is always applied in the +Y direction. It'
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif1" style="width: 80%;" />
 </div>
 
-
-<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD1.png" alt="coordinate" style="zoom:40%;" />
-
+<div align="center">
+  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD1.png" alt="FBD1" style="width:40%;" />
+</div>
 
 
 **Tension Demand**
@@ -588,8 +588,9 @@ In stilt mode, the equipment geometry does not change, instead we are rotating t
 </div>
 
 
-<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD2.png" alt="FBD2" style="zoom:40%;" />
-
+<div align="center">
+  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD2.png" alt="FBD2" style="width:40%;" />
+</div>
 
 
 **Tension Demand**
