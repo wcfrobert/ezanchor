@@ -16,7 +16,7 @@ EZAnchor evaluates overturning of nonstructural components due to seismic excita
 
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif2" style="width: 100%;" />
+  <img src="https://github.com/wcfrobert/ezanchor/blob/master/docs/pivot.gif?raw=true" alt="demogif2" style="width: 100%;" />
 </div>
 
 
@@ -497,7 +497,7 @@ In pivot mode, the seismic force (Fp) is always applied in the +Y direction. It'
 
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/pivot.gif" alt="demogif1" style="width: 80%;" />
+  <img src="https://github.com/wcfrobert/ezanchor/blob/master/docs/pivot.gif?raw=true" alt="demogif1" style="width: 80%;" />
 </div>
 
 <div align="center">
@@ -584,7 +584,7 @@ In stilt mode, the equipment geometry does not change, instead we are rotating t
 
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/stilt.gif" alt="demogif2" style="width: 80%;" />
+  <img src="https://github.com/wcfrobert/ezanchor/blob/master/docs/stilt.gif?raw=true" alt="demogif2" style="width: 80%;" />
 </div>
 
 
