@@ -10,28 +10,29 @@ def preview(equip_obj):
     fig.set_size_inches(6,6)
     
     # calculate center of gravities externally
-    x_list = []
-    y_list = []
-    for a in equip_obj.anchor_list:
-        x_list.append(a.xo)
-        y_list.append(a.yo) 
-    x_cog = sum(x_list) / equip_obj.N_anchor
-    y_cog = sum(y_list) / equip_obj.N_anchor
-    anchor_cog = [x_cog, y_cog]
-    equip_cog = anchor_cog if equip_obj.equip_cog == None else equip_obj.equip_cog
-    
-    # plot anchor points
-    for anchor in equip_obj.anchor_list:
-        axs.plot([anchor.xo],[anchor.yo], marker=".",c="blue",markersize=9,zorder=2,linestyle="none")
-        axs.annotate("{}".format(anchor.tag), xy=(anchor.xo, anchor.yo), xycoords='data', xytext=(0, 5), textcoords='offset points', fontsize=10, c="blue")
-    
-    # plot COGs
-    axs.plot(equip_cog[0], equip_cog[1], marker="x",c="black",markersize=6,zorder=2,linestyle="none")
-    axs.annotate("CoG",xy=(equip_cog[0], equip_cog[1]), xycoords='data', color="black",
-                    xytext=(0, 5), textcoords='offset points', fontsize=12)
-    axs.plot(anchor_cog[0], anchor_cog[1], marker="x",c="blue",markersize=6,zorder=2,linestyle="none")
-    axs.annotate("CoR",xy=(anchor_cog[0], anchor_cog[1]), xycoords='data', color="blue",
-                    xytext=(0, 5), textcoords='offset points', fontsize=12)
+    if equip_obj.N_anchor != 0:
+        x_list = []
+        y_list = []
+        for a in equip_obj.anchor_list:
+            x_list.append(a.xo)
+            y_list.append(a.yo) 
+        x_cog = sum(x_list) / equip_obj.N_anchor
+        y_cog = sum(y_list) / equip_obj.N_anchor
+        anchor_cog = [x_cog, y_cog]
+        equip_cog = anchor_cog if equip_obj.equip_cog == None else equip_obj.equip_cog
+        
+        # plot anchor points
+        for anchor in equip_obj.anchor_list:
+            axs.plot([anchor.xo],[anchor.yo], marker=".",c="blue",markersize=9,zorder=2,linestyle="none")
+            axs.annotate("{}".format(anchor.tag), xy=(anchor.xo, anchor.yo), xycoords='data', xytext=(0, 5), textcoords='offset points', fontsize=10, c="blue")
+        
+        # plot COGs
+        axs.plot(equip_cog[0], equip_cog[1], marker="x",c="black",markersize=6,zorder=2,linestyle="none")
+        axs.annotate("CoG",xy=(equip_cog[0], equip_cog[1]), xycoords='data', color="black",
+                        xytext=(0, 5), textcoords='offset points', fontsize=12)
+        axs.plot(anchor_cog[0], anchor_cog[1], marker="x",c="blue",markersize=6,zorder=2,linestyle="none")
+        axs.annotate("CoR",xy=(anchor_cog[0], anchor_cog[1]), xycoords='data', color="blue",
+                        xytext=(0, 5), textcoords='offset points', fontsize=12)
     
     # plot base patches
     N = int(len(equip_obj.bounding_points)/4)
@@ -47,6 +48,7 @@ def preview(equip_obj):
     fig.suptitle("Anchor and Footprint Preview")
     axs.set_aspect('equal', 'box')
     plt.tight_layout()
+    axs.autoscale_view()
         
     return fig
     

@@ -460,6 +460,7 @@ class Equipment:
         self.T_crit_anchor[deg] = t_crit_anchor
         self.C_crit_anchor[deg] = c_crit_anchor
         self.M_ot[deg] = math.sqrt((Mwx + Motx)**2 + (Mwy + Moty)**2)
+        self.T_min[deg] = Tmin
         self.T_max[deg] = Tmax
         self.Fh[deg] = F
         self.Fv[deg] = W
@@ -651,6 +652,7 @@ class Equipment:
         if not self.folder_created:
             self.create_output_folder()
         
+        # not very elegant. Can turn into data frame then to_csv along with __dict__. Will try to fix when I have the time.
         # write to csv files
         if self.on_stilt:
             file_path = os.path.join(self.output_dir, "{}_equipment.csv".format(self.name))
@@ -672,7 +674,7 @@ class Equipment:
                             f",{self.ecc_y[deg]}"+
                             f",{self.torsion[deg]}"+
                             f",{self.T_max[deg]}"+
-                            f",{self.C_max[deg]}"+
+                            f",{self.T_min[deg]}"+
                             f",{self.V_max[deg]}"+
                             f",{self.T_crit_anchor[deg]}"+
                             f",{self.C_crit_anchor[deg]}"+
