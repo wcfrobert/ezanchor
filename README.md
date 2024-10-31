@@ -1,4 +1,4 @@
-This python package accompanies the 2024 SEAOC Conference paper titled: "Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage" by Wang et al. For more information, refer to the paper in pdf format available in the "2024 SEAOC Conference Paper" folder. 
+**Note:** The following python package accompanies the 2024 SEAOC Conference paper titled: "Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage" by Wang et al. For more information, refer to the paper attached in this repo.
 
 
 <h1 align="center">
