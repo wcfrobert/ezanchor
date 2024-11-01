@@ -1,4 +1,13 @@
-**Note:** The following python package accompanies the 2024 SEAOC Conference paper titled: "Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage" by Wang et al. For more information, refer to the paper attached in this repo.
+The following python package accompanies the SEAOC 2024 Convention paper: 
+
+**"Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage" (Wang et al, 2024)**
+
+> The design of nonstructural component anchorage depends on both magnitude and direction of the seismic force (Fp), the latter of which is the subject of this paper. In recent years, research efforts led by ATC (2017) have greatly improved the estimation of seismic demand, resulting in a revamped Fp equation in the 2022 version of ASCE/SEI-7. As for direction, the code offers limited guidance and states that Fp shall be applied in the direction that produces the most critical load effects. Alternatively, the code permits the use of the empirical “100%-30%” directional combination like the one used in the seismic analysis of building structures. In this paper, we explore the surprisingly nuanced topic of critical load orientation for design of floor-mounted component anchorage. The study began with a rigorous definition of how the load effects – namely anchor shear and tension demand – are calculated, addressing variabilities in assumptions and methods in industry practice. The formulations were then incorporated into a standalone python package to streamline calculations. Using this program, a series of parametric studies were conducted to tackle the key question: “how does one determine the critical force direction for floor-mounted component anchorage?”. An example problem is provided at the end to illustrate the concepts discussed herein.
+>
+
+For additional details, please refer to the 2024 SEAOC Convention proceedings, accessible online.
+
+
 
 
 <h1 align="center">
