@@ -1,16 +1,3 @@
-The following python package accompanies the SEAOC 2024 Convention paper: 
-
-**"Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage" (Wang et al, 2024)**
-
-See abstract below. For additional information, please refer to the 2024 SEAOC Convention proceedings, accessible online.
-
-> The design of nonstructural component anchorage depends on both magnitude and direction of the seismic force (Fp), the latter of which is the subject of this paper. In recent years, research efforts led by ATC (2017) have greatly improved the estimation of seismic demand, resulting in a revamped Fp equation in the 2022 version of ASCE/SEI-7. As for direction, the code offers limited guidance and states that Fp shall be applied in the direction that produces the most critical load effects. Alternatively, the code permits the use of the empirical “100%-30%” directional combination like the one used in the seismic analysis of building structures. In this paper, we explore the surprisingly nuanced topic of critical load orientation for design of floor-mounted component anchorage. The study began with a rigorous definition of how the load effects – namely anchor shear and tension demand – are calculated, addressing variabilities in assumptions and methods in industry practice. The formulations were then incorporated into a standalone python package to streamline calculations. Using this program, a series of parametric studies were conducted to tackle the key question: “how does one determine the critical force direction for floor-mounted component anchorage?”. An example problem is provided at the end to illustrate the concepts discussed herein.
->
-
-
-
-
-
 <h1 align="center">
   <br>
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/logo.png" alt="logo" style="zoom:80%;" />
@@ -46,6 +33,16 @@ EZAnchor calculates anchor demands of floor-mounted nonstructural components sub
 - [Theoretical Background](#theoretical-background)
 - [Notes and Assumptions](#notes-and-assumptions)
 - [License](#license)
+
+
+
+> [!IMPORTANT]
+>
+> The following python package accompanies the SEAOC 2024 Convention paper: **"Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage"** (Wang et al, 2024). See abstract below. Please refer to the 2024 SEAOC Convention proceedings for more information.
+
+> The design of nonstructural component anchorage depends on both magnitude and direction of the seismic force (Fp), the latter of which is the subject of this paper. In recent years, research efforts led by ATC (2017) have greatly improved the estimation of seismic demand, resulting in a revamped Fp equation in the 2022 version of ASCE/SEI-7. As for direction, the code offers limited guidance and states that Fp shall be applied in the direction that produces the most critical load effects. Alternatively, the code permits the use of the empirical “100%-30%” directional combination like the one used in the seismic analysis of building structures. In this paper, we explore the surprisingly nuanced topic of critical load orientation for design of floor-mounted component anchorage. The study began with a rigorous definition of how the load effects – namely anchor shear and tension demand – are calculated, addressing variabilities in assumptions and methods in industry practice. The formulations were then incorporated into a standalone python package to streamline calculations. Using this program, a series of parametric studies were conducted to tackle the key question: “how does one determine the critical force direction for floor-mounted component anchorage?”. An example problem is provided at the end to illustrate the concepts discussed herein.
+
+
 
 
 
@@ -96,7 +93,7 @@ AHU4.add_anchor(x=30, y=125)
 AHU4.add_anchor(x=90, y=55)
 AHU4.add_anchor(x=90, y=125)
 
-# solveW
+# solve
 AHU4.solve(on_stilt=True)
 
 # visualization
@@ -378,9 +375,77 @@ AHU4.export_data()
 
 ## Theoretical Background
 
+### Anchor Group Geometric Properties
+
+The elastic method is commonly used in the design of bolted steel connections. In essence, a bolt group – or an anchor group in the context of component anchorage – is treated like an elastic section with geometric properties like centroid and moment of inertias. With this assumption in mind, finding anchor tension demands is entirely analogous to finding normal stresses using the combined elastic stress formulas presented in introductory mechanics of material courses. Unlike a cross-section, which has continuous area, anchors are assumed to have equal unitary area at discrete locations.
+
+Centroid:
+
+$$x_{COR} = \sum x_i / N_{anchors}$$
+
+$$y_{COR} = \sum y_i / N_{anchors}$$
+
+
+
+Moment of Inertias:
+
+$$I_x = \sum (y_i - y_{COR})^2$$
+
+$$I_y = \sum (y_x - x_{COR})^2$$
+
+
+
+Polar Moment of Inertia:
+
+$$J = I_x + I_y$$
+
+
+
+Product Moment of Inertia:
+
+$$I_{xy} = \sum(x_i - x_{COR})(y_i - y_{COR})$$
+
+
+
+Angle to Principal Orientation:
+
+$$\theta_p = 0.5 \times atan(\frac{I_{xy}}{2(I_x-I_y)})$$
+
+
+
 ### Anchor Shear - Elastic Method
 
+it is common to assume perfect alignment between anchor group COR and the component COM. In such cases, shear demand is simply the total horizontal force divided by the number of anchors.
 
+$$V_i =F_h/N_{anchor}$$
+
+In reality, COR and COM are often misaligned which produces additional shear demand due to in-plane torsion. The additional “torsional” shear demand can be calculated using the elastic method. This process is analogous to rigid diaphragm analysis where the total shear is equal to direct shear plus an additional torsional shear.
+
+$$V_i = V_{direct} + V_{torsion}$$
+
+Direct shear in both orthogonal direction:
+
+$$V_{direct,x} = -F_hcos(\theta) / N_{anchor}$$
+
+$$V_{direct,y} = -F_h sin(\theta) / N_{anchor}$$
+
+In-plane torsion is calculated as:
+
+$$e_x = x_{COM} - x_{COR}$$
+
+$$e_y = y_{COM} - y_{COR}$$
+
+$$M_{torsion} = -F_hcos(\theta) e_y + F_hsin(\theta)e_x$$
+
+Torsional shear is calculated as follows for an anchor located at $(x_i,y_i)$. 
+
+$$V_{torsion,x} = \frac{M_{torsion}(y_i - y_{COR})}{J}$$
+
+$$V_{torsion,y} = \frac{M_{torsion}(x_i - x_{COR})}{J}$$
+
+The resultant anchor shear is the sum of the terms above added together vectorially:
+
+$$V_i = \sqrt{(V_{direct,x} + V_{torsion,x})^2 + (V_{direct,y} + V_{torsion,y})^2}$$
 
 
 
