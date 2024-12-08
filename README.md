@@ -1,3 +1,10 @@
+> [!NOTE]
+>
+> The following python package was used to generate the results in the SEAOC 2024 Convention paper: **"Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage"** (Wang et al, 2024). See abstract below. Please refer to the 2024 SEAOC Convention proceedings for more information.
+
+> The design of nonstructural component anchorage depends on both magnitude and direction of the seismic force (Fp), the latter of which is the subject of this paper. In recent years, research efforts led by ATC (2017) have greatly improved the estimation of seismic demand, resulting in a revamped Fp equation in the 2022 version of ASCE/SEI-7. As for direction, the code offers limited guidance and states that Fp shall be applied in the direction that produces the most critical load effects. Alternatively, the code permits the use of the empirical “100%-30%” directional combination like the one used in the seismic analysis of building structures. In this paper, we explore the surprisingly nuanced topic of critical load orientation for design of floor-mounted component anchorage. The study began with a rigorous definition of how the load effects – namely anchor shear and tension demand – are calculated, addressing variabilities in assumptions and methods in industry practice. The formulations were then incorporated into a standalone python package to streamline calculations. Using this program, a series of parametric studies were conducted to tackle the key question: “how does one determine the critical force direction for floor-mounted component anchorage?”. An example problem is provided at the end to illustrate the concepts discussed herein.
+
+
 <h1 align="center">
   <br>
   <img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/logo.png" alt="logo" style="zoom:80%;" />
@@ -36,11 +43,6 @@ EZAnchor calculates anchor demands of floor-mounted nonstructural components sub
 
 
 
-> [!IMPORTANT]
->
-> The following python package accompanies the SEAOC 2024 Convention paper: **"Critical Orientation of Seismic Force for Floor-Mounted Nonstructural Component Anchorage"** (Wang et al, 2024). See abstract below. Please refer to the 2024 SEAOC Convention proceedings for more information.
-
-> The design of nonstructural component anchorage depends on both magnitude and direction of the seismic force (Fp), the latter of which is the subject of this paper. In recent years, research efforts led by ATC (2017) have greatly improved the estimation of seismic demand, resulting in a revamped Fp equation in the 2022 version of ASCE/SEI-7. As for direction, the code offers limited guidance and states that Fp shall be applied in the direction that produces the most critical load effects. Alternatively, the code permits the use of the empirical “100%-30%” directional combination like the one used in the seismic analysis of building structures. In this paper, we explore the surprisingly nuanced topic of critical load orientation for design of floor-mounted component anchorage. The study began with a rigorous definition of how the load effects – namely anchor shear and tension demand – are calculated, addressing variabilities in assumptions and methods in industry practice. The formulations were then incorporated into a standalone python package to streamline calculations. Using this program, a series of parametric studies were conducted to tackle the key question: “how does one determine the critical force direction for floor-mounted component anchorage?”. An example problem is provided at the end to illustrate the concepts discussed herein.
 
 
 
@@ -377,7 +379,7 @@ AHU4.export_data()
 
 ### Anchor Group Geometric Properties
 
-The elastic method is commonly used in the design of bolted steel connections. In essence, a bolt group – or an anchor group in the context of component anchorage – is treated like an elastic section with geometric properties like centroid and moment of inertias. With this assumption in mind, finding anchor tension demands is entirely analogous to finding normal stresses using the combined elastic stress formulas presented in introductory mechanics of material courses. Unlike a cross-section, which has continuous area, anchors are assumed to have equal unitary area at discrete locations.
+An anchor group can be treated like an elastic section with geometric properties like centroid and moment of inertias. Unlike a cross-section, which has continuous area, anchors are assumed to have equal unitary area at discrete locations.
 
 Centroid:
 
@@ -419,7 +421,7 @@ it is common to assume perfect alignment between anchor group COR and the compon
 
 $$V_i =F_h/N_{anchor}$$
 
-In reality, COR and COM are often misaligned which produces additional shear demand due to in-plane torsion. The additional “torsional” shear demand can be calculated using the elastic method. This process is analogous to rigid diaphragm analysis where the total shear is equal to direct shear plus an additional torsional shear.
+In reality, COR and COM are often misaligned which produces additional shear demand due to in-plane torsion. The total shear demand is equal to direct shear plus an additional torsional shear.
 
 $$V_i = V_{direct} + V_{torsion}$$
 
@@ -451,15 +453,98 @@ $$V_i = \sqrt{(V_{direct,x} + V_{torsion,x})^2 + (V_{direct,y} + V_{torsion,y})^
 
 ### Anchor Tension - Elastic Method
 
+Use this method by setting the `on_stilt` parameter to `False`. There are two major assumptions when we use the elastic method. 
+
+* Neutral axis coincides with the anchor group centroidal axis. 
+* Overturning moment is resolved entirely through the anchors without consideration of any bearing surface. Anchors are assumed to take compression, and must do so to maintain equilibrium.
+
+Elastic method assumes that tension demand varies linearly, emanating from zero at the centroid outwards to the extreme fibers/anchors/legs.
+
+<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD2.png" alt="visual2" style="zoom:50%;" />
+
+Because anchors can theoretically take compression in this method, we have track the signs carefully. Let the vertical and horizontal force $F_v$ and $F_h$ always be positive. Negative signs are inserted where applicable to maintain right-hand convention.
+
+Axial demand due to self-weight is simply the vertical force divided by the number of anchors.
+
+$$P_{weight} = -F_v/N_{anchors}$$
+
+Overturning moment due to horizontal force
+
+$$M_{OT,x} = -F_h sin(\theta) \times Z_{COM}$$
+
+$$M_{OT,y} = F_h cos(\theta) \times Z_{COM}$$
+
+If weight is off-centered, there is an additional self-weight-induced overturning demand. This shifts the weight distribution such that $F_v$ is no longer evenly distributed amongst the anchors.
+
+$$M_{weight,x} = -F_v (y_{COM} - y_{COR})$$
+
+$$M_{weight,y} = F_v (x_{COM} - x_{COR})$$
+
+The total overturning moment:
+
+$$M_{total,x} = M_{OT,x} + M_{weight,x}$$
+
+$$M_{total,y} = M_{OT,y} + M_{weight,y}$$
+
+Axial demand due to overturning:
+
+$$P_{Mx} = \frac{M_{total,x}(y_i - y_{COR})}{I_x}$$
+
+$$P_{My} = \frac{M_{total,y}(x_i - x_{COR})}{I_y}$$
+
+Apply principle of superposition to get the total anchor axial demand
+
+$$P_i = P_{weight} + P_{Mx} + P_{My}$$
+
+The equations above are only valid when the anchor group is in its principal orientation ($I_{xy}=0$).
+
 
 
 ### Anchor Tension - Rigid Base Method
 
+Use this method by setting the `on_stilt` parameter to `True`. Here, we idealize the equipment as a rigid box with a fully rigid base. 
+
+As the component tips over, a linear strain profile is assumed along the base. Embedded in this method is an assumption of neutral axis depth, whose determination is a topic of considerable variability. EZAnchor takes the simplest approach of assuming axis of rotation to occur at the very edge of the component. In the figure below, notice how the bearing reaction (C) is a concentrated point load rather than a distributed load whose resultant lies some distance away from the edge. 
+
+In most cases, the depth of compression stress block is relatively small compared to the component footprint due to ample bearing area and low tensile capacity of concrete anchors. Nevertheless, It may be prudent to check if the component footprint is indeed large enough relative to the neutral axis depth. 
 
 
 
+<img src="https://raw.githubusercontent.com/wcfrobert/ezanchor/master/docs/FBD1.png" alt="visual2" style="zoom:50%;" />
 
+The applied horizontal force induces an overturning moment:
 
+$$M_{OT} = F_h \times Z_{COM}$$
+
+The vertical force from the weight of the equipment induces a restoring moment that counteracts the overturning moment. $d_w$ is the distance between component center of mass, and the point of pivot which is assumed at the edge of the component.
+
+$$M_R = F_v \times d_w$$
+
+The net overturning moment is equal to:
+
+$$M_{net} = M_{OT} - M_{R}$$
+
+If $M_{net}$ is negative, then the component is not at risk of tipping over. Otherwise, tension demands are calculated by assuming a linear profile. Anchor furthest away from the neutral axis has the highest tension demand and is denoted $T_N$, For the other anchors:
+
+$$T_i = \frac{d_i}{d_N}T_n$$
+
+With this linear relationship established, use the moment equilibrium equation and solve for $T_n$
+
+$$\sum M = 0 = -F_hZ_{COM} + F_vd_w + \sum T_i d_i$$
+
+$$F_h Z_{COM} - F_v d_w = M_{net} = \sum (\frac{d_i}{d_N}T_n)d_i$$
+
+$$M_{net} = \frac{T_n}{d_n}\sum (d_i)^2$$
+
+$$T_n = T_{max} = \frac{M_{net} d_N}{\sum (d_i)^2}$$
+
+Once we have $T_n$, use the linear relationship to determine $T_i$ (the intermediate anchors). Alternatively, we can just use the equation above for all anchors but just replace $d_N$ with $d_i$. Does it seem familiar? Looks like the elastic method just with the neutral axis shifted!
+
+$$T_i = \frac{M_{net}d_i}{\sum (d_i)^2}$$
+
+Lastly, the compression resultant can be calculated using force equilibrium:
+
+$$C = F_v + \sum T_i$$
 
 
 ## Notes and Assumptions
@@ -470,7 +555,7 @@ $$V_i = \sqrt{(V_{direct,x} + V_{torsion,x})^2 + (V_{direct,y} + V_{torsion,y})^
   * Z is the vertical axis (Elevation)
   * X and Y are the axes on plan. +X points to the right, +Y points up
 * Sign convention:
-  * At degree 0, seismic load is applied in the +Y direction (upward) (don't ask me why I rotated 90 degrees. Makes no sense in retrospect)
+  * At degree 0, seismic load is applied in the +Y direction (upward) (don't ask me why I rotated 90 degrees. Makes no sense in retrospect. Ideally you should make +X the 0th degree so the cosines and sines just work)
   * Sign of moment follows the right-hand rule. Mz is positive counter-clockwise
   * Compression is negative (-), tension is positive (+)
 * EZAnchor is agnostic when it comes to unit. Please ensure your input is consistent. I prefer to use lbs and inches
