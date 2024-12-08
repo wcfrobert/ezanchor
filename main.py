@@ -2,7 +2,8 @@ import ezanchor as eza
 
 # initialize equipment anchorage analysis
 AHU4 = eza.equipment.Equipment(name="AHU4", Sds=1.85, Ip=1, h=44, z=44, ap=2.5, Rp=2, omega=2, 
-                               weight=3500, CGz=64, CGx=40, CGy=85, load_combo="LRFD", use_omega=True)
+                               weight=3500, CGz=64, CGx=40, CGy=85, 
+                               load_combo="LRFD", use_omega=True)
 
 # define base footprint
 AHU4.add_footprint(xo=0, yo=0, b=60, h=120)
@@ -19,10 +20,10 @@ AHU4.add_anchor(x=90, y=125)
 # solveW
 AHU4.solve(on_stilt=True)
 
-# visualization options
-fig = eza.plotter.preview(AHU4)
-fig3 = eza.plotter.plot_equipment(AHU4)
-fig2 = eza.plotter.plot_anchor(AHU4, 2)
+# visualization
+eza.plotter.preview(AHU4)
+eza.plotter.plot_equipment(AHU4)
+eza.plotter.plot_anchor(AHU4, 2)
 
-# export data
-#AHU4.export_data()
+# export data in spreadsheet format within current working directory
+AHU4.export_data()
