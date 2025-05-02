@@ -2,9 +2,6 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.version]
-path = "ezanchor/__init__.py"
-
 
 [project]
 name = "ezanchor"
@@ -31,6 +28,9 @@ keywords = [
     "seismic force"
 ]
 
+
+[tool.hatch.version]
+path = "ezanchor/__init__.py"
 
 
 [project.urls]
